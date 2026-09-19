@@ -1,0 +1,136 @@
+// HHGOA Fraud Investigation Agent
+// TigerGraph Vertex Definitions
+
+// CUSTOMER
+
+CREATE VERTEX Customer (
+    PRIMARY_ID customer_id STRING,
+    transaction_count UINT,
+    total_amount DOUBLE,
+    avg_amount DOUBLE,
+    max_risk_score DOUBLE,
+    avg_risk_score DOUBLE
+) WITH primary_id_as_attribute="true";
+
+// TRANSACTION
+
+CREATE VERTEX Transaction (
+    PRIMARY_ID transaction_id STRING,
+    transaction_dt UINT,
+    transaction_amount DOUBLE,
+    product_code STRING,
+
+    card1 STRING,
+    card2 STRING,
+    card3 STRING,
+    card4 STRING,
+    card5 STRING,
+    card6 STRING,
+
+    addr1 STRING,
+    addr2 STRING,
+    dist1 DOUBLE,
+    dist2 DOUBLE,
+
+    p_email_domain STRING,
+    r_email_domain STRING,
+
+    transaction_timestamp DATETIME,
+    channel STRING,
+    risk_score DOUBLE
+) WITH primary_id_as_attribute="true";
+
+// CARD
+
+CREATE VERTEX Card (
+    PRIMARY_ID card_key STRING,
+
+    card1 STRING,
+    card2 STRING,
+    card3 STRING,
+    card4 STRING,
+    card5 STRING,
+    card6 STRING
+) WITH primary_id_as_attribute="true";
+
+// IDENTITY
+
+CREATE VERTEX Identity (
+    PRIMARY_ID identity_id STRING,
+
+    id_01 DOUBLE,
+    id_02 DOUBLE,
+    id_03 DOUBLE,
+    id_04 DOUBLE,
+    id_05 DOUBLE,
+    id_06 DOUBLE,
+
+    id_12 DOUBLE,
+    id_13 DOUBLE,
+    id_14 DOUBLE,
+
+    id_30 DOUBLE,
+    id_31 DOUBLE,
+    id_32 DOUBLE,
+    id_33 DOUBLE,
+    id_34 DOUBLE,
+    id_35 DOUBLE,
+    id_36 DOUBLE,
+    id_37 DOUBLE,
+    id_38 DOUBLE,
+
+    device_type STRING,
+    device_info STRING
+) WITH primary_id_as_attribute="true";
+
+// DEVICE
+
+CREATE VERTEX Device (
+    PRIMARY_ID device_key STRING,
+
+    device_type STRING,
+    device_info STRING
+) WITH primary_id_as_attribute="true";
+
+// BENCHMARK / ACTIVE CASE
+
+CREATE VERTEX Case (
+    PRIMARY_ID case_id STRING,
+
+    opened_at DATETIME,
+    trigger_type STRING,
+    trigger_text STRING,
+
+    flagged_txn_id STRING,
+    card_id STRING,
+    customer_id STRING,
+
+    risk_score DOUBLE
+) WITH primary_id_as_attribute="true";
+
+// HISTORICAL CLOSED CASE
+
+CREATE VERTEX HistoricalCase (
+    PRIMARY_ID case_id STRING,
+
+    customer_id STRING,
+    card_id STRING,
+
+    opened_at DATETIME,
+    closed_at DATETIME,
+
+    outcome STRING,
+    pattern STRING,
+
+    first_fraud_txn_id STRING,
+    txn_ids STRING,
+
+    n_txns UINT,
+    exposure_usd DOUBLE,
+
+    connected_card_ids STRING,
+
+    actions_taken STRING,
+    report_filed BOOL,
+    analyst_notes STRING
+) WITH primary_id_as_attribute="true";

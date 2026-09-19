@@ -1,0 +1,51 @@
+// HHGOA Fraud Investigation Agent
+// TigerGraph Edge Definitions
+
+// CUSTOMER -> TRANSACTION
+
+CREATE DIRECTED EDGE CustomerMakesTransaction (
+    FROM Customer,
+    TO Transaction
+);
+
+// TRANSACTION -> CARD
+
+CREATE DIRECTED EDGE TransactionUsesCard (
+    FROM Transaction,
+    TO Card
+);
+
+// TRANSACTION -> IDENTITY
+
+CREATE DIRECTED EDGE TransactionHasIdentity (
+    FROM Transaction,
+    TO Identity
+);
+
+// TRANSACTION -> DEVICE
+
+CREATE DIRECTED EDGE TransactionUsesDevice (
+    FROM Transaction,
+    TO Device
+);
+
+// CASE -> TRANSACTION
+
+CREATE DIRECTED EDGE CaseFlagsTransaction (
+    FROM Case,
+    TO Transaction
+);
+
+// CASE -> CUSTOMER
+
+CREATE DIRECTED EDGE CaseInvolvesCustomer (
+    FROM Case,
+    TO Customer
+);
+
+// HISTORICAL CASE -> CUSTOMER
+
+CREATE DIRECTED EDGE HistoricalCaseInvolvesCustomer (
+    FROM HistoricalCase,
+    TO Customer
+);
