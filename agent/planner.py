@@ -13,7 +13,14 @@ class InvestigationPlanner:
         self,
         investigation: dict[str, Any],
         assessment: dict[str, Any],
+        memory_context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        memory_context = memory_context or {}
+
+        historical_match_count = memory_context.get(
+            "historical_match_count",
+            0,
+        )
 
         risk_level = assessment.get(
             "risk_level",
@@ -168,6 +175,10 @@ class InvestigationPlanner:
             "requires_more_evidence": requires_more_evidence,
             "next_phase": next_phase,
             "fraud_patterns": fraud_patterns,
+            "historical_memory": {
+                "match_count": historical_match_count,
+                "available": historical_match_count > 0,
+            },
             "plan": steps,
             "plan_summary": self._build_summary(
                 risk_level=risk_level,

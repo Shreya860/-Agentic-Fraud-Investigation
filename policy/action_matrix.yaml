@@ -1,0 +1,67 @@
+actions:
+
+  allow_transaction:
+    category: transaction
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  monitor_transaction:
+    category: transaction
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  block_transaction:
+    category: transaction
+    allowed: true
+    requires_approval: true
+    approval_route: authorized_analyst
+
+  monitor_account:
+    category: account
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  block_account:
+    category: account
+    allowed: true
+    requires_approval: true
+    approval_route: authorized_analyst
+
+  request_customer_validation:
+    category: evidence_gathering
+    allowed: true
+    requires_approval: true
+    approval_route: authorized_analyst
+
+  request_step_up_authentication:
+    category: evidence_gathering
+    allowed: true
+    requires_approval: true
+    approval_route: authorized_analyst
+
+  retrieve_similar_cases:
+    category: investigation
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  check_external_fraud_intelligence:
+    category: investigation
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  create_case:
+    category: case_management
+    allowed: true
+    requires_approval: false
+    approval_route: none
+
+  escalate_to_analyst:
+    category: escalation
+    allowed: true
+    requires_approval: false
+    approval_route: authorized_analyst
