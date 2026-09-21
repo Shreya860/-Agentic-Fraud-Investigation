@@ -1,0 +1,20 @@
+CREATE QUERY customer_transaction_history(
+    STRING customer_id,
+    INT limit = 10
+) FOR GRAPH FraudInvestigationGraph {
+
+    ListAccum<STRING> @@transaction_ids;
+
+    Start = {Customer.*};
+
+    CustomerSet = SELECT c
+                  FROM Start:c
+                  WHERE c.customer_id == customer_id;
+
+    Transactions = SELECT t
+                   FROM CustomerSet:c -(CustomerMakesTransaction:e)-> Transaction:t
+                   ORDER BY t.ts DESC
+                   LIMIT limit;
+
+    PRINT Transactions;
+}

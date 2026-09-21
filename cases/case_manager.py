@@ -1,24 +1,27 @@
+from datetime import datetime, timezone
 from typing import Any
 
-from cases.models import create_case, utc_now
+from cases.models import create_case
 
 
 class CaseManager:
-    """Manage the lifecycle and investigation records of fraud cases."""
-
     def __init__(self):
-        self._cases: dict[str, dict[str, Any]] = {}
+        self.cases: dict[str, dict[str, Any]] = {}
+        self._case_counter = 0
+
+    def _generate_case_id(self) -> str:
+        self._case_counter += 1
+        return f"CASE-{self._case_counter:03d}"
 
     def create_case(
         self,
-        case_id: str,
         customer_id: str,
-        trigger_type: str,
-        trigger_text: str,
+        trigger_type: str = "analyst_request",
+        trigger_text: str = "",
         flagged_txn_id: str | None = None,
     ) -> dict[str, Any]:
-        if case_id in self._cases:
-            return self._cases[case_id]
+
+        case_id = self._generate_case_id()
 
         case = create_case(
             case_id=case_id,
@@ -28,21 +31,23 @@ class CaseManager:
             flagged_txn_id=flagged_txn_id,
         )
 
-        self._cases[case_id] = case
+        self.cases[case_id] = case
+
         return case
 
     def get_case(self, case_id: str) -> dict[str, Any] | None:
-        return self._cases.get(case_id)
+        return self.cases.get(case_id)
 
     def add_evidence(
         self,
         case_id: str,
         evidence: dict[str, Any],
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["evidence"].append(evidence)
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         return case
 
@@ -51,10 +56,11 @@ class CaseManager:
         case_id: str,
         finding: dict[str, Any],
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["findings"].append(finding)
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         return case
 
@@ -63,10 +69,11 @@ class CaseManager:
         case_id: str,
         decision: dict[str, Any],
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["decisions"].append(decision)
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         return case
 
@@ -75,22 +82,24 @@ class CaseManager:
         case_id: str,
         action: dict[str, Any],
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["actions"].append(action)
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         return case
 
     def add_approval_request(
         self,
         case_id: str,
-        approval: dict[str, Any],
+        approval_request: dict[str, Any],
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
-        case["approval_requests"].append(approval)
-        case["updated_at"] = utc_now()
+        case["approval_requests"].append(approval_request)
+        case["updated_at"] = self._utc_now()
 
         return case
 
@@ -99,10 +108,11 @@ class CaseManager:
         case_id: str,
         risk_level: str,
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["risk_level"] = risk_level
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         return case
 
@@ -111,13 +121,14 @@ class CaseManager:
         case_id: str,
         status: str,
     ) -> dict[str, Any]:
+
         case = self._require_case(case_id)
 
         case["status"] = status
-        case["updated_at"] = utc_now()
+        case["updated_at"] = self._utc_now()
 
         if status == "closed":
-            case["closed_at"] = utc_now()
+            case["closed_at"] = self._utc_now()
 
         return case
 
@@ -125,19 +136,28 @@ class CaseManager:
         self,
         case_id: str,
     ) -> dict[str, Any]:
+
         return self.update_status(case_id, "closed")
 
     def list_cases(self) -> list[dict[str, Any]]:
-        return list(self._cases.values())
+        return list(self.cases.values())
 
     def _require_case(self, case_id: str) -> dict[str, Any]:
+
         case = self.get_case(case_id)
 
         if case is None:
-            raise ValueError(f"Case '{case_id}' does not exist.")
+            raise ValueError(f"Case not found: {case_id}")
 
         return case
 
+    @staticmethod
+    def _utc_now() -> str:
+        return datetime.now(timezone.utc).isoformat()
+
+
+_case_manager = CaseManager()
+
 
 def get_case_manager() -> CaseManager:
-    return CaseManager()
+    return _case_manager

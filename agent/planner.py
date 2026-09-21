@@ -1,6 +1,4 @@
 from typing import Any
-
-
 class InvestigationPlanner:
     """
     Determines what the fraud investigation should do next.

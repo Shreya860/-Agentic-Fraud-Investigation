@@ -1,7 +1,5 @@
 from typing import Any
-
 from tools.graph_tools import GraphTools
-
 
 class FraudInvestigator:
     """
@@ -15,9 +13,7 @@ class FraudInvestigator:
     def __init__(self, graph_tools: GraphTools | None = None):
         self.graph_tools = graph_tools or GraphTools()
 
-    # ============================================================
     # CUSTOMER INVESTIGATION
-    # ============================================================
 
     def investigate_customer(
         self,
@@ -73,9 +69,7 @@ class FraudInvestigator:
             "raw_network": network,
         }
 
-    # ============================================================
     # EVIDENCE
-    # ============================================================
 
     def _build_evidence(
         self,
@@ -92,10 +86,8 @@ class FraudInvestigator:
             {},
         )
 
-        # --------------------------------------------------------
         # Customer transaction volume
-        # --------------------------------------------------------
-
+        
         transaction_count = customer_network.get(
             "transaction_count",
             0,
@@ -115,10 +107,8 @@ class FraudInvestigator:
             }
         )
 
-        # --------------------------------------------------------
         # High-risk transactions
-        # --------------------------------------------------------
-
+        
         high_risk_transactions = network.get(
             "high_risk_transactions",
             [],
@@ -167,10 +157,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Card connections
-        # --------------------------------------------------------
-
+        
         connected_by_card = network.get(
             "connected_by_card",
             [],
@@ -208,10 +196,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Device connections
-        # --------------------------------------------------------
-
+       
         connected_by_device = network.get(
             "connected_by_device",
             [],
@@ -283,10 +269,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Device rarity
-        # --------------------------------------------------------
-
+       
         device_rarity = network.get(
             "device_rarity",
             [],
@@ -318,10 +302,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Email domains
-        # --------------------------------------------------------
-
+       
         email_domains = customer_network.get(
             "email_domains",
             [],
@@ -341,10 +323,8 @@ class FraudInvestigator:
             }
         )
 
-        # --------------------------------------------------------
         # Channels
-        # --------------------------------------------------------
-
+       
         channels = customer_network.get(
             "channels",
             [],
@@ -366,10 +346,8 @@ class FraudInvestigator:
 
         return evidence
 
-    # ============================================================
     # FINDINGS
-    # ============================================================
-
+ 
     def _build_findings(
         self,
         network: dict[str, Any],
@@ -387,10 +365,8 @@ class FraudInvestigator:
             [],
         )
 
-        # --------------------------------------------------------
         # High risk finding
-        # --------------------------------------------------------
-
+       
         if high_risk_transactions:
 
             maximum_risk = max(
@@ -430,10 +406,8 @@ class FraudInvestigator:
                     }
                 )
 
-        # --------------------------------------------------------
         # Shared card finding
-        # --------------------------------------------------------
-
+       
         connected_by_card = network.get(
             "connected_by_card",
             [],
@@ -456,10 +430,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Rare device finding
-        # --------------------------------------------------------
-
+       
         device_rarity = network.get(
             "device_rarity",
             [],
@@ -491,10 +463,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # Generic device connections are NOT elevated
-        # --------------------------------------------------------
-
+        
         connected_by_device = network.get(
             "connected_by_device",
             [],
@@ -529,10 +499,8 @@ class FraudInvestigator:
                 }
             )
 
-        # --------------------------------------------------------
         # No strong evidence
-        # --------------------------------------------------------
-
+        
         if not findings:
 
             findings.append(
@@ -550,10 +518,8 @@ class FraudInvestigator:
 
         return findings
 
-    # ============================================================
     # SUMMARY
-    # ============================================================
-
+    
     def _build_summary(
         self,
         network: dict[str, Any],
@@ -634,10 +600,8 @@ class FraudInvestigator:
             "finding_count": len(findings),
         }
 
-    # ============================================================
     # HELPERS
-    # ============================================================
-
+   
     @staticmethod
     def _risk_severity(
         risk_score: float,
@@ -658,10 +622,7 @@ class FraudInvestigator:
 
         return "low"
 
-
-# ================================================================
 # FACTORY
-# ================================================================
 
 def get_investigator(
     graph_tools: GraphTools | None = None,

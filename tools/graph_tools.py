@@ -1,9 +1,6 @@
 from pathlib import Path
 from typing import Any
-
 import pandas as pd
-
-
 ROOT = Path(__file__).resolve().parents[1]
 
 TRANSACTION_FILE = (
@@ -42,10 +39,8 @@ class GraphTools:
         self._devices: pd.DataFrame | None = None
         self._device_edges: pd.DataFrame | None = None
 
-    # ============================================================
     # DATA LOADING
-    # ============================================================
-
+    
     def _load_transactions(self) -> pd.DataFrame:
         """Load processed transaction data lazily."""
 
@@ -94,10 +89,8 @@ class GraphTools:
 
         return self._device_edges
 
-    # ============================================================
     # CUSTOMER NETWORK
-    # ============================================================
-
+    
     def get_customer_network(
         self,
         customer_id: str,
@@ -133,10 +126,8 @@ class GraphTools:
                 "recent_transactions": [],
             }
 
-        # --------------------------------------------------------
         # Cards
-        # --------------------------------------------------------
-
+       
         card_columns = [
             "card1",
             "card2",
@@ -175,10 +166,8 @@ class GraphTools:
 
         cards = sorted(set(cards))
 
-        # --------------------------------------------------------
         # Devices
-        # --------------------------------------------------------
-
+       
         transaction_ids = set(
             customer_transactions["TransactionID"]
             .dropna()
@@ -201,10 +190,8 @@ class GraphTools:
             )
         )
 
-        # --------------------------------------------------------
         # Email domains
-        # --------------------------------------------------------
-
+       
         email_domains: set[str] = set()
 
         for column in [
@@ -226,10 +213,8 @@ class GraphTools:
                 if value and value.lower() != "nan"
             )
 
-        # --------------------------------------------------------
         # Channels
-        # --------------------------------------------------------
-
+        
         channels: list[str] = []
 
         if "channel" in customer_transactions.columns:
@@ -241,10 +226,8 @@ class GraphTools:
                 )
             )
 
-        # --------------------------------------------------------
         # Recent transactions
-        # --------------------------------------------------------
-
+       
         recent_transactions = customer_transactions.copy()
 
         if "ts" in recent_transactions.columns:
@@ -282,10 +265,8 @@ class GraphTools:
             "recent_transactions": recent_transactions_list,
         }
 
-    # ============================================================
     # CARD NETWORK
-    # ============================================================
-
+    
     def get_card_network(
         self,
         card_key: str,
@@ -363,10 +344,8 @@ class GraphTools:
             "transactions": transaction_list,
         }
 
-    # ============================================================
     # DEVICE NETWORK
-    # ============================================================
-
+   
     def get_device_network(
         self,
         device_key: str,
@@ -457,10 +436,8 @@ class GraphTools:
             "transactions": transaction_list,
         }
 
-    # ============================================================
     # SHARED CARD CONNECTIONS
-    # ============================================================
-
+    
     def find_connected_customers(
         self,
         customer_id: str,
@@ -564,10 +541,8 @@ class GraphTools:
             )
         ]
 
-    # ============================================================
     # SHARED DEVICE CONNECTIONS
-    # ============================================================
-
+   
     def find_connected_customers_by_device(
         self,
         customer_id: str,
@@ -595,10 +570,8 @@ class GraphTools:
         transactions = self._load_transactions()
         device_edges = self._load_device_edges()
 
-        # --------------------------------------------------------
         # Get transactions belonging to target customer
-        # --------------------------------------------------------
-
+        
         customer_transactions = transactions[
             transactions["customer_id"].astype(str)
             == str(customer_id)
@@ -613,10 +586,8 @@ class GraphTools:
             .astype(str)
         )
 
-        # --------------------------------------------------------
         # Find devices used by target customer
-        # --------------------------------------------------------
-
+       
         customer_device_edges = device_edges[
             device_edges["transaction_id"]
             .astype(str)
@@ -635,10 +606,8 @@ class GraphTools:
         if not customer_devices:
             return []
 
-        # --------------------------------------------------------
         # Find all transactions using those devices
-        # --------------------------------------------------------
-
+        
         connected_edges = device_edges[
             device_edges["device_key"]
             .astype(str)
@@ -654,10 +623,8 @@ class GraphTools:
             .astype(str)
         )
 
-        # --------------------------------------------------------
         # Get transactions of OTHER customers
-        # --------------------------------------------------------
-
+        
         connected_transactions = transactions[
             transactions["TransactionID"]
             .astype(str)
@@ -672,10 +639,8 @@ class GraphTools:
         if connected_transactions.empty:
             return []
 
-        # --------------------------------------------------------
         # Normalize transaction IDs for merge
-        # --------------------------------------------------------
-
+       
         connected_transactions[
             "transaction_id_str"
         ] = (
@@ -690,10 +655,8 @@ class GraphTools:
             .astype(str)
         )
 
-        # --------------------------------------------------------
         # Attach device_key to every connected transaction
-        # --------------------------------------------------------
-
+       
         connected_transactions = connected_transactions.merge(
             connected_edges[
                 [
@@ -708,10 +671,8 @@ class GraphTools:
         if connected_transactions.empty:
             return []
 
-        # --------------------------------------------------------
         # Aggregate by customer + specific device
-        # --------------------------------------------------------
-
+       
         grouped = (
             connected_transactions
             .groupby(
@@ -741,10 +702,8 @@ class GraphTools:
             .reset_index()
         )
 
-        # --------------------------------------------------------
         # Sort strongest connections first
-        # --------------------------------------------------------
-
+      
         grouped = grouped.sort_values(
             [
                 "shared_transactions",
@@ -753,10 +712,8 @@ class GraphTools:
             ascending=False,
         ).head(limit)
 
-        # --------------------------------------------------------
         # Return clean dictionaries
-        # --------------------------------------------------------
-
+       
         return [
             {
                 key: self._clean_value(value)
@@ -767,10 +724,8 @@ class GraphTools:
             )
         ]
 
-    # ============================================================
     # DEVICE RARITY
-    # ============================================================
-
+   
     def get_device_rarity(
         self,
         device_key: str,
@@ -843,10 +798,8 @@ class GraphTools:
             "rarity": rarity,
         }
 
-    # ============================================================
     # COMPLETE CUSTOMER INVESTIGATION NETWORK
-    # ============================================================
-
+   
     def get_investigation_network(
         self,
         customer_id: str,
@@ -902,10 +855,8 @@ class GraphTools:
             )
         )
 
-        # --------------------------------------------------------
         # Device rarity for devices used by this customer
-        # --------------------------------------------------------
-
+       
         device_rarity = []
 
         for device_key in customer_network.get(
@@ -919,10 +870,8 @@ class GraphTools:
 
             device_rarity.append(rarity)
 
-        # --------------------------------------------------------
         # High-risk customer transactions
-        # --------------------------------------------------------
-
+      
         if "risk_score" in customer_transactions.columns:
 
             risk_values = pd.to_numeric(
@@ -962,10 +911,8 @@ class GraphTools:
             "high_risk_transactions": high_risk_transactions,
         }
 
-    # ============================================================
     # UTILITY
-    # ============================================================
-
+    
     @staticmethod
     def _clean_value(value: Any) -> Any:
         """
