@@ -1,0 +1,12 @@
+import type { HistoricalCase } from "../types";
+
+export const mockHistory: HistoricalCase[] = [
+  { caseId: "CASE-48291", pattern: "Account Takeover",     customerId: "CUS-10482", customerName: "Priya Sharma",   riskLevel: "very_high", similarity: 0.92, outcome: "confirmed_fraud", date: "2024-03-02", summary: "New device + high-value e-commerce transaction from foreign IP." },
+  { caseId: "CASE-38192", pattern: "Card Not Present",     customerId: "CUS-34821", customerName: "Ananya Iyer",    riskLevel: "high",      similarity: 0.86, outcome: "confirmed_fraud", date: "2024-01-19", summary: "Multiple low-value e-commerce purchases on a new card." },
+  { caseId: "CASE-29771", pattern: "New Device Fraud",     customerId: "CUS-50911", customerName: "Meera Krishnan", riskLevel: "high",      similarity: 0.81, outcome: "confirmed_fraud", date: "2023-11-08", summary: "New device fingerprint shared with 3 unrelated accounts." },
+  { caseId: "CASE-27410", pattern: "Wire Fraud",           customerId: "CUS-20391", customerName: "Rahul Mehta",    riskLevel: "high",      similarity: 0.78, outcome: "confirmed_fraud", date: "2023-10-21", summary: "Outbound wire to high-risk jurisdiction with rapid velocity." },
+  { caseId: "CASE-25112", pattern: "Account Takeover",     customerId: "CUS-70014", customerName: "Sneha Patel",    riskLevel: "very_high", similarity: 0.74, outcome: "confirmed_fraud", date: "2023-09-05", summary: "SIM swap followed by wire transfer to unknown recipient." },
+  { caseId: "CASE-23300", pattern: "Card Testing",         customerId: "CUS-92017", customerName: "Divya Menon",    riskLevel: "moderate",  similarity: 0.62, outcome: "inconclusive",    date: "2023-08-12", summary: "Rapid low-value e-commerce purchases across multiple merchants." },
+  { caseId: "CASE-21044", pattern: "Merchant Anomaly",     customerId: "CUS-60233", customerName: "Arjun Verma",    riskLevel: "moderate",  similarity: 0.55, outcome: "false_positive",  date: "2023-06-30", summary: "Unusual merchant category later confirmed as legitimate." },
+  { caseId: "CASE-19820", pattern: "Benign",               customerId: "CUS-81200", customerName: "Karthik Rao",    riskLevel: "low",       similarity: 0.31, outcome: "false_positive",  date: "2023-05-14", summary: "Low-value transaction flagged by rule, verified by customer." },
+];

@@ -1,0 +1,14 @@
+import type { Customer } from "../types";
+
+export const mockCustomers: Customer[] = [
+  { customerId: "CUS-10482", name: "Priya Sharma",   email: "priya.sharma@example.com", riskLevel: "very_high", riskScore: 0.94, transactionCount: 128, deviceCount: 4, cardCount: 3, openCases: 2, lastActivity: "2024-06-11T09:14:00Z", country: "IN", accountAgeYears: 6 },
+  { customerId: "CUS-20391", name: "Rahul Mehta",    email: "rahul.mehta@example.com",  riskLevel: "high",      riskScore: 0.78, transactionCount: 92,  deviceCount: 3, cardCount: 2, openCases: 1, lastActivity: "2024-06-11T08:02:00Z", country: "IN", accountAgeYears: 4 },
+  { customerId: "CUS-34821", name: "Ananya Iyer",    email: "ananya.iyer@example.com",  riskLevel: "moderate",  riskScore: 0.62, transactionCount: 47,  deviceCount: 2, cardCount: 2, openCases: 0, lastActivity: "2024-06-10T21:41:00Z", country: "IN", accountAgeYears: 3 },
+  { customerId: "CUS-41120", name: "Vikram Nair",    email: "vikram.nair@example.com",  riskLevel: "low",       riskScore: 0.23, transactionCount: 210, deviceCount: 1, cardCount: 4, openCases: 0, lastActivity: "2024-06-10T18:22:00Z", country: "IN", accountAgeYears: 8 },
+  { customerId: "CUS-50911", name: "Meera Krishnan", email: "meera.k@example.com",      riskLevel: "high",      riskScore: 0.91, transactionCount: 63,  deviceCount: 5, cardCount: 2, openCases: 1, lastActivity: "2024-06-11T07:33:00Z", country: "IN", accountAgeYears: 2 },
+  { customerId: "CUS-60233", name: "Arjun Verma",    email: "arjun.verma@example.com",  riskLevel: "moderate",  riskScore: 0.41, transactionCount: 155, deviceCount: 2, cardCount: 3, openCases: 0, lastActivity: "2024-06-09T14:11:00Z", country: "IN", accountAgeYears: 5 },
+  { customerId: "CUS-70014", name: "Sneha Patel",    email: "sneha.patel@example.com",  riskLevel: "very_high", riskScore: 0.97, transactionCount: 34,  deviceCount: 6, cardCount: 1, openCases: 3, lastActivity: "2024-06-11T10:05:00Z", country: "IN", accountAgeYears: 1 },
+  { customerId: "CUS-81200", name: "Karthik Rao",    email: "karthik.rao@example.com",  riskLevel: "low",       riskScore: 0.31, transactionCount: 88,  deviceCount: 2, cardCount: 2, openCases: 0, lastActivity: "2024-06-08T11:45:00Z", country: "IN", accountAgeYears: 7 },
+  { customerId: "CUS-92017", name: "Divya Menon",    email: "divya.menon@example.com",  riskLevel: "moderate",  riskScore: 0.55, transactionCount: 71,  deviceCount: 3, cardCount: 2, openCases: 0, lastActivity: "2024-06-10T16:02:00Z", country: "IN", accountAgeYears: 4 },
+  { customerId: "CUS-98765", name: "Rohit Bansal",   email: "rohit.bansal@example.com", riskLevel: "high",      riskScore: 0.81, transactionCount: 44,  deviceCount: 4, cardCount: 1, openCases: 1, lastActivity: "2024-06-11T06:48:00Z", country: "IN", accountAgeYears: 2 },
+];
