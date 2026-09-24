@@ -4,6 +4,7 @@
     "customer_id": "C12382",
     "flagged_txn_id": "3514030",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3514030 ($77.07, in billing region 444.0) at 0.61. Review and decide.",
     "result": {
       "customer_id": "C12382",
       "case_id": "CASE-001",
@@ -3909,6 +3910,7 @@
     "customer_id": "C11891",
     "flagged_txn_id": "3478782",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3478782 ($292.36, online) at 0.79. Review and decide.",
     "result": {
       "customer_id": "C11891",
       "case_id": "CASE-001",
@@ -14023,6 +14025,7 @@
     "customer_id": "C08623",
     "flagged_txn_id": "3530164",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C08623 message: 'I never made this $49.00 purchase. Please check my card.' Refers to 3530164.",
     "result": {
       "customer_id": "C08623",
       "case_id": "CASE-001",
@@ -25918,6 +25921,7 @@
     "customer_id": "C08106",
     "flagged_txn_id": "3583227",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C08106 message: 'I never made this $128.33 purchase. Please check my card.' Refers to 3583227.",
     "result": {
       "customer_id": "C08106",
       "case_id": "CASE-001",
@@ -33812,6 +33816,7 @@
     "customer_id": "C02923",
     "flagged_txn_id": "3523199",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3523199 ($100.07, online) at 0.54. Review and decide.",
     "result": {
       "customer_id": "C02923",
       "case_id": "CASE-001",
@@ -48369,6 +48374,7 @@
     "customer_id": "C07297",
     "flagged_txn_id": "3476682",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C07297 message: 'I never made this $482.12 purchase. Please check my card.' Refers to 3476682.",
     "result": {
       "customer_id": "C07297",
       "case_id": "CASE-001",
@@ -54034,6 +54040,7 @@
     "customer_id": "C09933",
     "flagged_txn_id": "3514948",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3514948 ($111.92, in billing region 264.0) at 0.87. Review and decide.",
     "result": {
       "customer_id": "C09933",
       "case_id": "CASE-001",
@@ -66692,6 +66699,7 @@
     "customer_id": "C13171",
     "flagged_txn_id": "3558054",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C13171 message: 'I never made this $55.68 purchase. Please check my card.' Refers to 3558054.",
     "result": {
       "customer_id": "C13171",
       "case_id": "CASE-001",
@@ -70154,6 +70162,7 @@
     "customer_id": "C08299",
     "flagged_txn_id": "3581141",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C08299 message: 'I never made this $30.02 purchase. Please check my card.' Refers to 3581141.",
     "result": {
       "customer_id": "C08299",
       "case_id": "CASE-001",
@@ -83349,6 +83358,7 @@
     "customer_id": "C10434",
     "flagged_txn_id": "3506725",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
     "result": {
       "customer_id": "C10434",
       "case_id": "CASE-001",
@@ -94409,6 +94419,7 @@
     "customer_id": "C11923",
     "flagged_txn_id": "3583368",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C11923 message: 'I never made this $131.30 purchase. Please check my card.' Refers to 3583368.",
     "result": {
       "customer_id": "C11923",
       "case_id": "CASE-001",
@@ -96620,6 +96631,7 @@
     "customer_id": "C05876",
     "flagged_txn_id": "3553342",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3553342 ($30.91, in billing region 494.0) at 0.55. Review and decide.",
     "result": {
       "customer_id": "C05876",
       "case_id": "CASE-001",
@@ -109581,6 +109593,7 @@
     "customer_id": "C07671",
     "flagged_txn_id": "3526826",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3526826 ($35.66, online) at 0.76. Review and decide.",
     "result": {
       "customer_id": "C07671",
       "case_id": "CASE-001",
@@ -121433,6 +121446,7 @@
     "customer_id": "C13487",
     "flagged_txn_id": "3478561",
     "trigger_type": "analyst_request",
+    "trigger_text": "Analyst request: several cards this month show purchases from the same unusual device profile. Review transaction 3478561 on card C13487-K1 and look for related activity.",
     "result": {
       "customer_id": "C13487",
       "case_id": "CASE-001",
@@ -127106,6 +127120,7 @@
     "customer_id": "C03042",
     "flagged_txn_id": "3464869",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3464869 ($599.94, online) at 0.77. Review and decide.",
     "result": {
       "customer_id": "C03042",
       "case_id": "CASE-001",
@@ -141500,6 +141515,7 @@
     "customer_id": "C09988",
     "flagged_txn_id": "3534820",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C09988 message: 'I never made this $59.67 purchase. Please check my card.' Refers to 3534820.",
     "result": {
       "customer_id": "C09988",
       "case_id": "CASE-001",
@@ -148701,6 +148717,7 @@
     "customer_id": "C04570",
     "flagged_txn_id": "3450629",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3450629 ($100.09, online) at 0.57. Review and decide.",
     "result": {
       "customer_id": "C04570",
       "case_id": "CASE-001",
@@ -162420,6 +162437,7 @@
     "customer_id": "C02354",
     "flagged_txn_id": "3491361",
     "trigger_type": "customer_report",
+    "trigger_text": "Customer C02354 message: 'I never made this $39.08 purchase. Please check my card.' Refers to 3491361.",
     "result": {
       "customer_id": "C02354",
       "case_id": "CASE-001",
@@ -175474,6 +175492,7 @@
     "customer_id": "C07987",
     "flagged_txn_id": "3503878",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3503878 ($99.92, online) at 0.90. Review and decide.",
     "result": {
       "customer_id": "C07987",
       "case_id": "CASE-001",
@@ -188317,6 +188336,7 @@
     "customer_id": "C12265",
     "flagged_txn_id": "3509359",
     "trigger_type": "risk_score",
+    "trigger_text": "Real-time model scored transaction 3509359 ($125.08, online) at 0.52. Review and decide.",
     "result": {
       "customer_id": "C12265",
       "case_id": "CASE-001",
