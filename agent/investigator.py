@@ -19,7 +19,9 @@ class FraudInvestigator:
         self,
         customer_id: str,
         limit: int = 10,
+        flagged_txn_id: str | None = None,
     ) -> dict[str, Any]:
+        
         """
         Investigate a customer using the available graph-style tools.
 
@@ -54,6 +56,26 @@ class FraudInvestigator:
         evidence = self._build_evidence(network)
 
         findings = self._build_findings(network)
+                # Add the benchmark/case flagged transaction explicitly.
+        if flagged_txn_id is not None:
+            flagged_transaction = self._get_flagged_transaction(
+                flagged_txn_id
+            )
+
+            if flagged_transaction is not None:
+                evidence.insert(
+                    0,
+                    {
+                        "type": "flagged_transaction",
+                        "severity": "case_trigger",
+                        "description": (
+                            f"Flagged transaction "
+                            f"{flagged_txn_id} was explicitly "
+                            "identified by the case trigger."
+                        ),
+                        "data": flagged_transaction,
+                    },
+                )
 
         summary = self._build_summary(
             network=network,
@@ -68,7 +90,20 @@ class FraudInvestigator:
             "investigation_summary": summary,
             "raw_network": network,
         }
+    
+    def _get_flagged_transaction(
+        self,
+            transaction_id: str,
+    ) -> dict[str, Any] | None:
+        """Retrieve the transaction explicitly flagged by the case."""
 
+        from tools.transaction_tools import TransactionTools
+
+        transaction_tools = TransactionTools()
+
+        return transaction_tools.get_transaction(
+            str(transaction_id)
+        )
     # EVIDENCE
 
     def _build_evidence(
