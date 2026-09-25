@@ -2,29 +2,28 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderSearch,
+  Network,
   Users,
   CreditCard,
-  Network,
   Brain,
   BarChart3,
-  FileText,
-  Settings as SettingsIcon,
   Bell,
   Search,
   ShieldCheck,
+  Sun,
+  Moon,
 } from "lucide-react";
 import ToastStack from "../components/Toast";
+import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
   { to: "/dashboard",      label: "Dashboard",       icon: LayoutDashboard },
   { to: "/investigations", label: "Investigations",  icon: FolderSearch },
+  { to: "/graph",          label: "Knowledge Graph", icon: Network },
   { to: "/customers",      label: "Customers",       icon: Users },
   { to: "/transactions",   label: "Transactions",    icon: CreditCard },
-  { to: "/graph",          label: "Knowledge Graph", icon: Network },
   { to: "/case-memory",    label: "Case Memory",     icon: Brain },
   { to: "/analytics",      label: "Analytics",       icon: BarChart3 },
-  { to: "/reports",        label: "Reports",         icon: FileText },
-  { to: "/settings",       label: "Settings",        icon: SettingsIcon },
 ];
 
 function pageTitle(pathname: string): string {
@@ -42,6 +41,7 @@ function pageTitle(pathname: string): string {
 
 export default function AppLayout() {
   const { pathname } = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="app-shell">
@@ -69,13 +69,6 @@ export default function AppLayout() {
           })}
         </nav>
 
-        <div className="sidebar-user">
-          <div className="sidebar-user-avatar">AK</div>
-          <div style={{ minWidth: 0 }}>
-            <div className="sidebar-user-name">A. Kapoor</div>
-            <div className="sidebar-user-role">Senior Fraud Analyst</div>
-          </div>
-        </div>
       </aside>
 
       <div className="main">
@@ -97,6 +90,13 @@ export default function AppLayout() {
           </button>
           <button className="topbar-icon-btn" aria-label="Policy">
             <ShieldCheck size={16} />
+          </button>
+          <button
+            className="topbar-icon-btn"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
         </header>
 

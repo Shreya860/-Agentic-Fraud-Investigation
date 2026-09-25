@@ -1,9 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // FRONTEND DATA SERVICE
 // ─────────────────────────────────────────────────────────────
-// The Investigations list now reads live benchmark output from
-// the FastAPI backend (/api/benchmark/summary). Everything else
-// still uses in-memory mock data.
+// Live benchmark and static datasets are adapted to the UI domain types here.
 // ─────────────────────────────────────────────────────────────
 
 import type {
@@ -21,6 +19,7 @@ import type {
   ApprovalRequest,
   Uncertainty,
   GraphData,
+  ActionType,
 } from "../types";
 
 import { mockCases } from "../data/mockCases";
@@ -50,7 +49,23 @@ import {
 // Simulate the async nature of real I/O without slowing the UI.
 const resolve = <T>(value: T): Promise<T> => Promise.resolve(value);
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "";
+const STATIC_API_BASE = "";
+
+async function fetchStatic<T>(name: string): Promise<T> {
+  const res = await fetch(`${STATIC_API_BASE}/api/${name}.json`);
+  if (!res.ok) throw new Error(`${name} fetch failed: ${res.status}`);
+  return (await res.json()) as T;
+}
+
+export interface AnalyticsData {
+  riskDistribution: Record<string, number>;
+  recommendedActionDistribution: Partial<Record<ActionType, number>>;
+  averageRiskScore: number;
+  totalCases: number;
+  casesPerCustomer: Record<string, number>;
+  casesPerTriggerType: Record<string, number>;
+}
 
 // ─────────────────────────────────────────────────────────────
 // Public API
@@ -58,63 +73,112 @@ const API_BASE = "http://127.0.0.1:8000";
 export const dataService = {
   // Cases — LIVE from backend
   async getInvestigations(): Promise<InvestigationCase[]> {
-    const res = await fetch(`${API_BASE}/api/benchmark/summary`);
-    if (!res.ok) {
-      throw new Error(`Benchmark fetch failed: ${res.status}`);
-    }
-    const rows: any[] = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/api/benchmark/summary.json`);
+      if (!res.ok) throw new Error(`Benchmark fetch failed: ${res.status}`);
+      const rows: any[] = await res.json();
 
-    return rows.map((b): InvestigationCase => {
-      const rawTrigger = String(b.benchmark_input?.trigger_type ?? "risk_score");
-      const triggerType =
-        rawTrigger === "risk_score" ? "Rule Engine" : rawTrigger;
+      return rows.map((b): InvestigationCase => {
+        const rawTrigger = String(b.benchmark_input?.trigger_type ?? "risk_score");
+        const triggerType =
+          rawTrigger === "risk_score" ? "Rule Engine" : rawTrigger;
+
+        return {
+          caseId: String(b.case_id),
+          customerId: String(b.customer_id),
+          customerName: String(b.customer_id),
+          riskLevel: (b.risk_level ?? "low") as InvestigationCase["riskLevel"],
+          riskScore: typeof b.risk_score === "number" ? b.risk_score : 0,
+          status: "investigating",
+          triggerType,
+          triggerText:
+            b.benchmark_input?.trigger_text ??
+            "Automated fraud investigation",
+          flaggedTransactionId: String(
+            b.benchmark_input?.flagged_txn_id ?? ""
+          ),
+          amount: 0,
+          channel: "online",
+          assignedAnalyst: "auto",
+          createdAt: new Date().toISOString(),
+          nextBestAction: (b.recommended_action ??
+            "monitor_transaction") as InvestigationCase["nextBestAction"],
+          pattern: "",
+        };
+      });
+    } catch (error) {
+      console.error("getInvestigations failed:", error);
+      return mockCases;
+    }
+  },
+
+  async getInvestigation(caseId: string): Promise<InvestigationCase | undefined> {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/benchmark/cases/${caseId}.json`
+      );
+      if (!res.ok) {
+        throw new Error(`Benchmark case fetch failed: ${res.status}`);
+      }
+      const b = await res.json();
 
       return {
         caseId: String(b.case_id),
         customerId: String(b.customer_id),
         customerName: String(b.customer_id),
-        riskLevel: (b.risk_level ?? "low") as any,
-        riskScore: typeof b.risk_score === "number" ? b.risk_score : 0,
-        status: "investigating" as any,
-        triggerType: triggerType as any,
-        triggerText:
-          b.benchmark_input?.trigger_text ??
-          "Automated fraud investigation",
-        flaggedTransactionId: String(
-          b.benchmark_input?.flagged_txn_id ?? ""
+        riskLevel: (b.assessment?.risk_level ?? "low") as InvestigationCase["riskLevel"],
+        riskScore:
+          typeof b.assessment?.risk_score === "number"
+            ? b.assessment.risk_score
+            : 0,
+        status: "investigating",
+        triggerType: "Rule Engine",
+        triggerText: String(
+          b.benchmark_input?.trigger_text ?? "Automated fraud investigation"
         ),
+        flaggedTransactionId: String(b.benchmark_input?.flagged_txn_id ?? ""),
         amount: 0,
         channel: "online",
         assignedAnalyst: "auto",
         createdAt: new Date().toISOString(),
-        nextBestAction: (b.recommended_action ?? "monitor") as any,
+        nextBestAction: (b.decision?.recommended_action ??
+          "monitor") as InvestigationCase["nextBestAction"],
         pattern: "",
-      } as unknown as InvestigationCase;
-    });
-  },
-
-  getInvestigation(caseId: string): Promise<InvestigationCase | undefined> {
-    return resolve(mockCases.find((c) => c.caseId === caseId));
+      };
+    } catch (error) {
+      console.error(`getInvestigation failed for ${caseId}:`, error);
+      return mockCases.find((c) => c.caseId === caseId);
+    }
   },
 
   // Customers
-  getCustomers(): Promise<Customer[]> {
-    return resolve(mockCustomers);
+  async getCustomers(): Promise<Customer[]> {
+    try {
+      return await fetchStatic<Customer[]>("customers");
+    } catch (error) {
+      console.error("getCustomers failed:", error);
+      return mockCustomers;
+    }
   },
 
-  getCustomer(customerId: string): Promise<Customer | undefined> {
-    return resolve(mockCustomers.find((c) => c.customerId === customerId));
+  async getCustomer(customerId: string): Promise<Customer | undefined> {
+    const customers = await this.getCustomers();
+    return customers.find((c) => c.customerId === customerId);
   },
 
   // Transactions
-  getTransactions(): Promise<Transaction[]> {
-    return resolve(mockTransactions);
+  async getTransactions(): Promise<Transaction[]> {
+    try {
+      return await fetchStatic<Transaction[]>("transactions");
+    } catch (error) {
+      console.error("getTransactions failed:", error);
+      return mockTransactions;
+    }
   },
 
-  getTransaction(transactionId: string): Promise<Transaction | undefined> {
-    return resolve(
-      mockTransactions.find((t) => t.transactionId === transactionId)
-    );
+  async getTransaction(transactionId: string): Promise<Transaction | undefined> {
+    const transactions = await this.getTransactions();
+    return transactions.find((t) => t.transactionId === transactionId);
   },
 
   // Cards / Devices / Identities
@@ -148,14 +212,35 @@ export const dataService = {
   },
 
   // Historical cases
-  getHistoricalCases(): Promise<HistoricalCase[]> {
-    return resolve(mockHistory);
+  async getHistoricalCases(): Promise<HistoricalCase[]> {
+    try {
+      return await fetchStatic<HistoricalCase[]>("historical-cases");
+    } catch (error) {
+      console.error("getHistoricalCases failed:", error);
+      return mockHistory;
+    }
   },
 
-  getHistoricalCasesForCase(caseId: string): Promise<HistoricalCase[]> {
-    const sorted = [...mockHistory].sort((a, b) => b.similarity - a.similarity);
+  async getHistoricalCasesForCase(caseId: string): Promise<HistoricalCase[]> {
+    const cases = await this.getHistoricalCases();
     void caseId;
-    return resolve(sorted);
+    return [...cases].sort((a, b) => b.similarity - a.similarity);
+  },
+
+  async getAnalytics(): Promise<AnalyticsData> {
+    try {
+      return await fetchStatic<AnalyticsData>("analytics");
+    } catch (error) {
+      console.error("getAnalytics failed:", error);
+      return {
+        riskDistribution: {},
+        recommendedActionDistribution: {},
+        averageRiskScore: 0,
+        totalCases: 0,
+        casesPerCustomer: {},
+        casesPerTriggerType: {},
+      };
+    }
   },
 
   // Case-scoped
@@ -186,8 +271,15 @@ export const dataService = {
   },
 
   // Graph
-  getGraphData(caseId: string): Promise<GraphData> {
-    return resolve(mockGraph[caseId] ?? mockGraph["CASE-48291"]);
+  async getGraphData(caseId: string): Promise<GraphData> {
+    try {
+      const res = await fetch(`${STATIC_API_BASE}/api/graph.json`);
+      if (!res.ok) throw new Error(`Graph fetch failed: ${res.status}`);
+      return (await res.json()) as GraphData;
+    } catch (error) {
+      console.error(`getGraphData failed for ${caseId}:`, error);
+      return mockGraph[caseId] ?? mockGraph["CASE-48291"];
+    }
   },
 };
 

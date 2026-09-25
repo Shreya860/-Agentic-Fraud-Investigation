@@ -1,82 +1,57 @@
 import { useEffect, useMemo, useState } from "react";
-import { dataService } from "../services/dataService";
-import type { InvestigationCase } from "../types";
+import { dataService, type AnalyticsData } from "../services/dataService";
+import type { ActionType } from "../types";
 import Card from "../components/Card";
 import { BarChart, DonutChart, LineChart } from "../components/Charts";
 import { actionLabels } from "../data/mockCases";
 
 export default function Analytics() {
-  const [cases, setCases] = useState<InvestigationCase[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
 
   useEffect(() => {
-    dataService.getInvestigations().then(setCases);
+    dataService.getAnalytics().then(setAnalytics);
   }, []);
 
   const patternData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    cases.forEach((c) => {
-      const k = c.pattern ?? "Unclassified";
-      counts[k] = (counts[k] ?? 0) + 1;
-    });
-    return Object.entries(counts).map(([label, value]) => ({ label, value }));
-  }, [cases]);
+    return Object.entries(analytics?.casesPerTriggerType ?? {}).map(([label, value]) => ({ label, value }));
+  }, [analytics]);
 
   const riskDist = useMemo(() => {
-    const count = (l: string) => cases.filter((c) => c.riskLevel === l).length;
     return [
-      { label: "Very High", value: count("very_high"), color: "#b42318" },
-      { label: "High",      value: count("high"),      color: "#b54708" },
-      { label: "Moderate",  value: count("moderate"),  color: "#1d4ed8" },
-      { label: "Low",       value: count("low"),       color: "#067647" },
+      { label: "Very High", value: analytics?.riskDistribution.very_high ?? 0, color: "#b42318" },
+      { label: "High",      value: analytics?.riskDistribution.high ?? 0,      color: "#b54708" },
+      { label: "Moderate",  value: analytics?.riskDistribution.moderate ?? 0,  color: "#1d4ed8" },
+      { label: "Low",       value: analytics?.riskDistribution.low ?? 0,       color: "#067647" },
     ];
-  }, [cases]);
+  }, [analytics]);
 
-  const outcomes = useMemo(() => {
-    const count = (s: string) => cases.filter((c) => c.status === s).length;
-    return [
-      { label: "Resolved",   value: count("resolved"),         color: "#067647" },
-      { label: "In Flight",  value: count("investigating") + count("open"), color: "#1d4ed8" },
-      { label: "Approvals",  value: count("awaiting_approval"), color: "#b54708" },
-      { label: "Executed",   value: count("action_executed"),   color: "#7a5af8" },
-      { label: "Closed",     value: count("closed"),            color: "#344054" },
-    ];
-  }, [cases]);
+  const customerData = useMemo(
+    () => Object.entries(analytics?.casesPerCustomer ?? {}).map(([label, value], index) => ({
+      label,
+      value,
+      color: ["#1d4ed8", "#067647", "#b54708", "#7a5af8", "#b42318"][index % 5],
+    })),
+    [analytics]
+  );
 
   const actionDist = useMemo(() => {
-    const counts: Record<string, number> = {};
-    cases.forEach((c) => {
-      const k = actionLabels[c.nextBestAction];
-      counts[k] = (counts[k] ?? 0) + 1;
-    });
-    return Object.entries(counts).map(([label, value]) => ({ label, value }));
-  }, [cases]);
-
-  const resolutionTrend = [
-    { label: "W1", value: 4 },
-    { label: "W2", value: 6 },
-    { label: "W3", value: 5 },
-    { label: "W4", value: 8 },
-    { label: "W5", value: 11 },
-    { label: "W6", value: 9 },
-  ];
-
-  const avgResolution = useMemo(() => {
-    const n = cases.length;
-    if (n === 0) return "0.0";
-    return (n * 3.7).toFixed(1);
-  }, [cases]);
+    return Object.entries(analytics?.recommendedActionDistribution ?? {}).map(([action, value]) => ({
+      label: actionLabels[action as ActionType] ?? action,
+      value: value ?? 0,
+    }));
+  }, [analytics]);
 
   return (
     <div className="stack">
       <div className="grid grid-4">
-        <div className="card stat"><div className="stat-label">Avg Resolution</div><div className="stat-value">{avgResolution}h</div></div>
-        <div className="card stat"><div className="stat-label">Confirmed Fraud</div><div className="stat-value">7</div></div>
-        <div className="card stat"><div className="stat-label">False Positive Rate</div><div className="stat-value">18%</div></div>
-        <div className="card stat"><div className="stat-label">Total Cases</div><div className="stat-value">{cases.length}</div></div>
+        <div className="card stat"><div className="stat-label">Average Risk Score</div><div className="stat-value">{((analytics?.averageRiskScore ?? 0) * 100).toFixed(0)}</div></div>
+        <div className="card stat"><div className="stat-label">Customers With Cases</div><div className="stat-value">{Object.keys(analytics?.casesPerCustomer ?? {}).length}</div></div>
+        <div className="card stat"><div className="stat-label">Trigger Types</div><div className="stat-value">{Object.keys(analytics?.casesPerTriggerType ?? {}).length}</div></div>
+        <div className="card stat"><div className="stat-label">Total Cases</div><div className="stat-value">{analytics?.totalCases ?? 0}</div></div>
       </div>
 
       <div className="grid grid-2">
-        <Card title="Fraud Patterns" subtitle="Distribution across investigations">
+        <Card title="Cases per Trigger Type" subtitle="Distribution across benchmark investigations">
           <BarChart data={patternData} height={220} />
         </Card>
         <Card title="Risk Distribution">
@@ -85,16 +60,16 @@ export default function Analytics() {
       </div>
 
       <div className="grid grid-2">
-        <Card title="Investigation Outcomes">
-          <DonutChart slices={outcomes} />
+        <Card title="Cases per Customer">
+        <DonutChart slices={customerData.slice(0, 8)} />
         </Card>
         <Card title="Action Distribution">
           <BarChart data={actionDist} height={220} />
         </Card>
       </div>
 
-      <Card title="Case Resolution Trend" subtitle="Weekly resolved cases">
-        <LineChart data={resolutionTrend} height={220} />
+      <Card title="Cases per Trigger Type" subtitle="Benchmark trigger distribution">
+        <LineChart data={patternData} height={220} />
       </Card>
     </div>
   );
