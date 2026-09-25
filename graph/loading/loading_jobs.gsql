@@ -1,0 +1,15 @@
+Get-ChildItem -Recurse -File -Include *.gsql |
+  Where-Object { $_.FullName -notmatch '\\.git\\' } |
+  Select-String -Pattern "CREATE VERTEX|CREATE DIRECTED EDGE|CREATE UNDIRECTED EDGE" |
+  Select-Object Path, LineNumber, Line
+  "--- cards ---";           Get-Content data\processed\cards\cards.csv -TotalCount 2
+"--- identities ---";      Get-Content data\processed\identities\identities.csv -TotalCount 2
+"--- devices ---";         Get-Content data\processed\devices\devices.csv -TotalCount 2
+"--- historical_cases ---";Get-Content data\processed\cases\historical_cases.csv -TotalCount 2
+"--- benchmark_cases ---"; Get-Content data\processed\cases\benchmark_cases.csv -TotalCount 2
+"--- tx_uses_card ---";    Get-Content data\processed\edges\transaction_uses_card.csv -TotalCount 2
+"--- tx_has_identity ---"; Get-Content data\processed\edges\transaction_has_identity.csv -TotalCount 2
+"--- tx_uses_device ---";  Get-Content data\processed\edges\transaction_uses_device.csv -TotalCount 2
+"--- case_flags_tx ---";   Get-Content data\processed\edges\case_flags_transaction.csv -TotalCount 2
+"--- case_involves_cust ---";Get-Content data\processed\edges\case_involves_customer.csv -TotalCount 2
+"--- hist_case_cust ---";  Get-Content data\processed\edges\historical_case_customer.csv -TotalCount 2

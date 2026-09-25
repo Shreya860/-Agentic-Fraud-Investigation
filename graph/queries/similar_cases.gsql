@@ -1,0 +1,29 @@
+// similar_cases
+// Given a Customer, returns:
+//   - OwnCases          : HistoricalCases linked to this customer
+//   - SamePatternCases  : other HistoricalCases with a matching pattern string
+//
+// Called from Python as:
+//   c.run_query("similar_cases", params={"customer": ("C00259",)})
+
+CREATE QUERY similar_cases(
+    VERTEX<Customer> customer
+) FOR GRAPH FraudInvestigationGraph {
+
+    SetAccum<STRING> @@my_patterns;
+
+    AllHCs = {HistoricalCase.*};
+
+    // 1. seed customer's own historical cases (forward edge)
+    OwnCases = SELECT hc
+               FROM AllHCs:hc -(HistoricalCaseInvolvesCustomer:e)-> Customer:c
+               WHERE c == customer
+               ACCUM @@my_patterns += hc.pattern;
+
+    // 2. historical cases with a matching pattern
+    SamePatternCases = SELECT hc
+                       FROM AllHCs:hc
+                       WHERE hc.pattern IN @@my_patterns;
+
+    PRINT OwnCases, SamePatternCases;
+}

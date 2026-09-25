@@ -1,0 +1,57 @@
+// risk_context
+// Aggregate risk signals for a Customer: transaction counts split by risk tier,
+// max single transaction amount, and distinct device/card footprint.
+//
+// Called from Python as:
+//   c.run_query("risk_context", params={"customer": ("C06075",)})
+
+CREATE QUERY risk_context(
+    VERTEX<Customer> customer
+) FOR GRAPH FraudInvestigationGraph {
+
+    SumAccum<INT>    @@n_txns;
+    SumAccum<DOUBLE> @@total_amount;
+    MaxAccum<DOUBLE> @@max_amount;
+    SumAccum<INT>    @@n_high_risk;
+    SumAccum<INT>    @@n_medium_risk;
+    SetAccum<VERTEX> @@devices;
+    SetAccum<VERTEX> @@cards;
+
+    Seed = {customer};
+
+    // walk seed -> all transactions (forward)
+    Txns = SELECT t
+           FROM Seed:c -(CustomerMakesTransaction:e)-> Transaction:t
+           ACCUM
+               @@n_txns      += 1,
+               @@total_amount += t.transaction_amount,
+               @@max_amount   += t.transaction_amount;
+
+    // high / medium risk breakdown
+    HighRisk = SELECT t
+               FROM Txns:t
+               WHERE t.risk_score >= 0.7
+               ACCUM @@n_high_risk += 1;
+
+    MediumRisk = SELECT t
+                 FROM Txns:t
+                 WHERE t.risk_score >= 0.4 AND t.risk_score < 0.7
+                 ACCUM @@n_medium_risk += 1;
+
+    // distinct device / card footprint
+    Devs = SELECT d
+           FROM Txns:t -(TransactionUsesDevice:e)-> Device:d
+           ACCUM @@devices += d;
+
+    Cards = SELECT cd
+            FROM Txns:t -(TransactionUsesCard:e)-> Card:cd
+            ACCUM @@cards += cd;
+
+    PRINT @@n_txns           AS n_txns,
+          @@total_amount     AS total_amount,
+          @@max_amount       AS max_amount,
+          @@n_high_risk      AS n_high_risk,
+          @@n_medium_risk    AS n_medium_risk,
+          @@devices.size()   AS n_distinct_devices,
+          @@cards.size()     AS n_distinct_cards;
+}

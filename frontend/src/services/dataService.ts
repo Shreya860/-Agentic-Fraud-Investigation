@@ -1,16 +1,9 @@
 // ─────────────────────────────────────────────────────────────
 // FRONTEND DATA SERVICE
 // ─────────────────────────────────────────────────────────────
-// This module is the ONLY place the UI talks to "data". Today it
-// returns in-memory mock objects. When the backend is ready, the
-// developer replaces ONLY the bodies below with real API calls.
-//
-// Rules to keep this file backend-independent:
-//   1. No fetch() / axios in mock mode (see USE_BACKEND below).
-//   2. Every function is async and returns a Promise, so swapping
-//      to fetch() later does not change any calling component.
-//   3. Return shapes must match the TypeScript interfaces in
-//      src/types/index.ts.
+// The Investigations list now reads live benchmark output from
+// the FastAPI backend (/api/benchmark/summary). Everything else
+// still uses in-memory mock data.
 // ─────────────────────────────────────────────────────────────
 
 import type {
@@ -54,38 +47,53 @@ import {
   mockGraph,
 } from "../data/mockEvidence";
 
-// Optional backend integration flag. Left false for the hackathon
-// demo so the app runs with zero network dependency.
-const USE_BACKEND = false;
-const API_BASE = ""; // e.g. "http://localhost:8000"
-
-// Small helper used only if USE_BACKEND is flipped on later.
-async function _fetch<T>(path: string, fallback: T): Promise<T> {
-  if (!USE_BACKEND) return fallback;
-  try {
-    const res = await fetch(`${API_BASE}${path}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return (await res.json()) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 // Simulate the async nature of real I/O without slowing the UI.
 const resolve = <T>(value: T): Promise<T> => Promise.resolve(value);
+
+const API_BASE = "http://127.0.0.1:8000";
 
 // ─────────────────────────────────────────────────────────────
 // Public API
 // ─────────────────────────────────────────────────────────────
 export const dataService = {
-  // Cases
-  getInvestigations(): Promise<InvestigationCase[]> {
-    // TODO: replace with _fetch("/cases", mockCases)
-    return resolve(mockCases);
+  // Cases — LIVE from backend
+  async getInvestigations(): Promise<InvestigationCase[]> {
+    const res = await fetch(`${API_BASE}/api/benchmark/summary`);
+    if (!res.ok) {
+      throw new Error(`Benchmark fetch failed: ${res.status}`);
+    }
+    const rows: any[] = await res.json();
+
+    return rows.map((b): InvestigationCase => {
+      const rawTrigger = String(b.benchmark_input?.trigger_type ?? "risk_score");
+      const triggerType =
+        rawTrigger === "risk_score" ? "Rule Engine" : rawTrigger;
+
+      return {
+        caseId: String(b.case_id),
+        customerId: String(b.customer_id),
+        customerName: String(b.customer_id),
+        riskLevel: (b.risk_level ?? "low") as any,
+        riskScore: typeof b.risk_score === "number" ? b.risk_score : 0,
+        status: "investigating" as any,
+        triggerType: triggerType as any,
+        triggerText:
+          b.benchmark_input?.trigger_text ??
+          "Automated fraud investigation",
+        flaggedTransactionId: String(
+          b.benchmark_input?.flagged_txn_id ?? ""
+        ),
+        amount: 0,
+        channel: "online",
+        assignedAnalyst: "auto",
+        createdAt: new Date().toISOString(),
+        nextBestAction: (b.recommended_action ?? "monitor") as any,
+        pattern: "",
+      } as unknown as InvestigationCase;
+    });
   },
 
   getInvestigation(caseId: string): Promise<InvestigationCase | undefined> {
-    // TODO: replace with _fetch(`/cases/${caseId}`, mockCases.find(...))
     return resolve(mockCases.find((c) => c.caseId === caseId));
   },
 
@@ -127,8 +135,6 @@ export const dataService = {
   },
 
   getDevicesForCustomer(customerId: string): Promise<Device[]> {
-    // In mock data, devices are not directly linked to customers;
-    // link via transactions the customer has made.
     const deviceIds = new Set(
       mockTransactions
         .filter((t) => t.customerId === customerId)
@@ -147,10 +153,8 @@ export const dataService = {
   },
 
   getHistoricalCasesForCase(caseId: string): Promise<HistoricalCase[]> {
-    // In mock data, just return the full list sorted by similarity.
-    // Real backend would filter by pattern / signals.
     const sorted = [...mockHistory].sort((a, b) => b.similarity - a.similarity);
-    void caseId; // reserved for future use
+    void caseId;
     return resolve(sorted);
   },
 

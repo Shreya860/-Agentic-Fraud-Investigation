@@ -1,0 +1,54 @@
+// customer_network
+// Co-customers sharing a card or device with the seed customer.
+// Forward-only traversal; no reverse edges, no primary-id access.
+// Uses SetAccum<VERTEX> for IN-filters (vertex sets aren't allowed there).
+
+CREATE QUERY customer_network(
+    VERTEX<Customer> customer
+) FOR GRAPH FraudInvestigationGraph {
+
+    SetAccum<VERTEX> @@my_cards;
+    SetAccum<VERTEX> @@my_devices;
+    SetAccum<VERTEX> @@card_txns;
+    SetAccum<VERTEX> @@device_txns;
+
+    // 1. seed -> own txns -> own cards / devices
+    Seed = {customer};
+
+    MyTxns = SELECT t
+             FROM Seed:c -(CustomerMakesTransaction:e)-> Transaction:t;
+
+    MyCards = SELECT cd
+              FROM MyTxns:t -(TransactionUsesCard:e)-> Card:cd
+              ACCUM @@my_cards += cd;
+
+    MyDevices = SELECT d
+                FROM MyTxns:t -(TransactionUsesDevice:e)-> Device:d
+                ACCUM @@my_devices += d;
+
+    // 2. full transaction scan, keep those touching my cards / devices
+    AllTxns = {Transaction.*};
+
+    CardTxnSet = SELECT t2
+                 FROM AllTxns:t2 -(TransactionUsesCard:e)-> Card:cd
+                 WHERE cd IN @@my_cards
+                 ACCUM @@card_txns += t2;
+
+    DeviceTxnSet = SELECT t2
+                   FROM AllTxns:t2 -(TransactionUsesDevice:e)-> Device:d
+                   WHERE d IN @@my_devices
+                   ACCUM @@device_txns += t2;
+
+    // 3. full customer scan, keep those with a matching transaction
+    AllCustomers = {Customer.*};
+
+    CoCustomersByCard = SELECT c2
+                        FROM AllCustomers:c2 -(CustomerMakesTransaction:e)-> Transaction:t2
+                        WHERE t2 IN @@card_txns AND c2 != customer;
+
+    CoCustomersByDevice = SELECT c2
+                          FROM AllCustomers:c2 -(CustomerMakesTransaction:e)-> Transaction:t2
+                          WHERE t2 IN @@device_txns AND c2 != customer;
+
+    PRINT CoCustomersByCard, CoCustomersByDevice;
+}

@@ -1,0 +1,41 @@
+// device_reuse
+// For the seed customer: how many devices they used, how many transactions
+// worldwide touch those devices, and which other customers share them.
+//
+// Called from Python as:
+//   c.run_query("device_reuse", params={"customer": ("C06075",)})
+
+CREATE QUERY device_reuse(
+    VERTEX<Customer> customer
+) FOR GRAPH FraudInvestigationGraph {
+
+    SetAccum<VERTEX> @@my_devices;
+    SetAccum<VERTEX> @@my_device_txns;
+    SetAccum<VERTEX> @@co_customers;
+
+    Seed = {customer};
+
+    // 1. seed -> own txns -> own devices
+    MyTxns = SELECT t
+             FROM Seed:c -(CustomerMakesTransaction:e)-> Transaction:t;
+
+    MyDevices = SELECT d
+                FROM MyTxns:t -(TransactionUsesDevice:e)-> Device:d
+                ACCUM @@my_devices += d;
+
+    // 2. scan all txns; keep those using any of my devices
+    AllTxns = {Transaction.*};
+    Matching = SELECT t2
+               FROM AllTxns:t2 -(TransactionUsesDevice:e)-> Device:d
+               WHERE d IN @@my_devices
+               ACCUM @@my_device_txns += t2;
+
+    // 3. scan all customers; keep those with a matching transaction
+    AllCusts = {Customer.*};
+    CoCusts = SELECT c2
+              FROM AllCusts:c2 -(CustomerMakesTransaction:e2)-> Transaction:t3
+              WHERE t3 IN @@my_device_txns AND c2 != customer
+              ACCUM @@co_customers += c2;
+
+    PRINT @@my_devices, @@my_device_txns, @@co_customers;
+}

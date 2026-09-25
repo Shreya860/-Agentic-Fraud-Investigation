@@ -1,0 +1,182 @@
+[
+  {
+    "case_id": "HHG-001",
+    "customer_id": "C12382",
+    "risk_level": "high",
+    "risk_score": 0.84,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.74,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-002",
+    "customer_id": "C11891",
+    "risk_level": "low",
+    "risk_score": 0.0,
+    "recommended_action": "allow_transaction",
+    "elapsed_s": 1.19,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-003",
+    "customer_id": "C08623",
+    "risk_level": "high",
+    "risk_score": 0.94,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.7,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-004",
+    "customer_id": "C08106",
+    "risk_level": "high",
+    "risk_score": 0.83,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 5.11,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-005",
+    "customer_id": "C02923",
+    "risk_level": "high",
+    "risk_score": 0.88,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.14,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-006",
+    "customer_id": "C07297",
+    "risk_level": "low",
+    "risk_score": 0.0,
+    "recommended_action": "allow_transaction",
+    "elapsed_s": 0.52,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-007",
+    "customer_id": "C09933",
+    "risk_level": "very_high",
+    "risk_score": 0.98,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 4.22,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-008",
+    "customer_id": "C13171",
+    "risk_level": "very_high",
+    "risk_score": 0.95,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 5.17,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-009",
+    "customer_id": "C08299",
+    "risk_level": "high",
+    "risk_score": 0.85,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.14,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-010",
+    "customer_id": "C10434",
+    "risk_level": "high",
+    "risk_score": 0.93,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 0.82,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-011",
+    "customer_id": "C11923",
+    "risk_level": "very_high",
+    "risk_score": 0.97,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 5.25,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-012",
+    "customer_id": "C05876",
+    "risk_level": "high",
+    "risk_score": 0.91,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 2.0,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-013",
+    "customer_id": "C07671",
+    "risk_level": "high",
+    "risk_score": 0.89,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.17,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-014",
+    "customer_id": "C13487",
+    "risk_level": "low",
+    "risk_score": 0.0,
+    "recommended_action": "allow_transaction",
+    "elapsed_s": 0.63,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-015",
+    "customer_id": "C03042",
+    "risk_level": "high",
+    "risk_score": 0.87,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.24,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-016",
+    "customer_id": "C09988",
+    "risk_level": "moderate",
+    "risk_score": 0.0,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.52,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-017",
+    "customer_id": "C04570",
+    "risk_level": "high",
+    "risk_score": 0.91,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.04,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-018",
+    "customer_id": "C02354",
+    "risk_level": "high",
+    "risk_score": 0.94,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 4.8,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-019",
+    "customer_id": "C07987",
+    "risk_level": "high",
+    "risk_score": 0.94,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 1.67,
+    "status": "ok"
+  },
+  {
+    "case_id": "HHG-020",
+    "customer_id": "C12265",
+    "risk_level": "high",
+    "risk_score": 0.86,
+    "recommended_action": "request_customer_validation",
+    "elapsed_s": 0.95,
+    "status": "ok"
+  }
+]
