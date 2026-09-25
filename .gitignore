@@ -35,3 +35,11 @@ frontend/dist/
 __pycache__/
 *.pyc
 resp.json
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
