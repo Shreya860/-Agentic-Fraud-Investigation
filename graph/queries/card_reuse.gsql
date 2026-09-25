@@ -1,0 +1,35 @@
+// card_reuse
+// For the seed customer: how many cards they used, how many transactions
+// worldwide touch those cards, and which other customers share them.
+
+CREATE QUERY card_reuse(
+    VERTEX<Customer> customer
+) FOR GRAPH FraudInvestigationGraph {
+
+    SetAccum<VERTEX> @@my_cards;
+    SetAccum<VERTEX> @@my_card_txns;
+    SetAccum<VERTEX> @@co_customers;
+
+    Seed = {customer};
+
+    MyTxns = SELECT t
+             FROM Seed:c -(CustomerMakesTransaction:e)-> Transaction:t;
+
+    MyCards = SELECT cd
+              FROM MyTxns:t -(TransactionUsesCard:e)-> Card:cd
+              ACCUM @@my_cards += cd;
+
+    AllTxns = {Transaction.*};
+    Matching = SELECT t2
+               FROM AllTxns:t2 -(TransactionUsesCard:e)-> Card:cd
+               WHERE cd IN @@my_cards
+               ACCUM @@my_card_txns += t2;
+
+    AllCusts = {Customer.*};
+    CoCusts = SELECT c2
+              FROM AllCusts:c2 -(CustomerMakesTransaction:e2)-> Transaction:t3
+              WHERE t3 IN @@my_card_txns AND c2 != customer
+              ACCUM @@co_customers += c2;
+
+    PRINT @@my_cards, @@my_card_txns, @@co_customers;
+}

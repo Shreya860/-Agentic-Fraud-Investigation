@@ -37,6 +37,9 @@ export default function Investigations() {
   const navigate = useNavigate();
   const [cases, setCases] = useState<InvestigationCase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [liveResult, setLiveResult] = useState<unknown>(null);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [liveError, setLiveError] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<InvestigationStatus | "all">("all");
@@ -46,11 +49,50 @@ export default function Investigations() {
   const [sortKey, setSortKey] = useState<"createdAt" | "riskScore">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
+  // Live list from backend benchmark outputs
   useEffect(() => {
-    dataService.getInvestigations().then((rows) => {
-      setCases(rows);
-      setLoading(false);
-    });
+    dataService
+      .getInvestigations()
+      .then((rows) => {
+        setCases(rows);
+      })
+      .catch((err) => {
+        console.error("getInvestigations failed:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Live single-case panel (C06075)
+  useEffect(() => {
+    const controller = new AbortController();
+    setLiveLoading(true);
+    setLiveError(null);
+
+    fetch("http://127.0.0.1:8000/investigations/customer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customer_id: "C06075", limit: 50 }),
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const text = await response.text();
+        if (!response.ok) {
+          throw new Error(`API ${response.status}: ${text.slice(0, 300)}`);
+        }
+        return text ? JSON.parse(text) : null;
+      })
+      .then((result: unknown) => {
+        console.log("LIVE BACKEND RESPONSE:", result);
+        setLiveResult(result);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error("LIVE BACKEND ERROR:", error);
+        setLiveError(String(error));
+      })
+      .finally(() => setLiveLoading(false));
+
+    return () => controller.abort();
   }, []);
 
   const analysts = useMemo(
@@ -107,7 +149,9 @@ export default function Investigations() {
       ),
     },
     { key: "status",   header: "Status",           render: (c) => <StatusBadge status={c.status} /> },
-    { key: "nba",      header: "Next Best Action", render: (c) => actionLabels[c.nextBestAction] },
+    { key: "nba",      header: "Next Best Action",
+      render: (c) => actionLabels[c.nextBestAction] || String(c.nextBestAction ?? "—"),
+    },
     { key: "created",  header: "Created",          render: (c) => (
         <button
           className="btn btn-sm btn-ghost"
@@ -123,6 +167,19 @@ export default function Investigations() {
 
   return (
     <div className="stack">
+      <Card
+        title="Live Investigation API"
+        subtitle="POST /investigations/customer · C06075"
+      >
+        {liveLoading && <div className="muted">Loading live result…</div>}
+        {liveError && <div className="error">{liveError}</div>}
+        {!liveLoading && !liveError && (
+          <pre style={{ overflowX: "auto", margin: 0 }}>
+            {JSON.stringify(liveResult, null, 2)}
+          </pre>
+        )}
+      </Card>
+
       <Card
         title="Investigations"
         subtitle={`${filtered.length} of ${cases.length} shown`}

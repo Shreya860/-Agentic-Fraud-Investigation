@@ -1,0 +1,19 @@
+// transaction_context
+// Given a Transaction vertex, returns the card, identity, and device
+// attached to it via the three outbound edges.
+//
+// Called from Python as:
+//   c.run_query("transaction_context", params={"txn": ("3000001",)})
+
+CREATE QUERY transaction_context(
+    VERTEX<Transaction> txn
+) FOR GRAPH FraudInvestigationGraph {
+
+    seed = {txn};
+
+    cards      = SELECT c FROM seed:t -(TransactionUsesCard:e)->     Card:c;
+    identities = SELECT i FROM seed:t -(TransactionHasIdentity:e)-> Identity:i;
+    devices    = SELECT d FROM seed:t -(TransactionUsesDevice:e)->   Device:d;
+
+    PRINT seed, cards, identities, devices;
+}

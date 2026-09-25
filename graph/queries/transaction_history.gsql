@@ -1,20 +1,23 @@
-CREATE QUERY customer_transaction_history(
-    STRING customer_id,
-    INT limit = 10
+// customer_transaction_history_v2
+// Returns the transaction history for a given Customer vertex.
+// Called from Python via tools.tigergraph_client as:
+//   c.run_query("customer_transaction_history_v2",
+//               params={"customer": ("C06075",)})
+//
+// VERTEX<Customer> param is required — the caller passes a 1-tuple
+// of the vertex id: ("C06075",). pyTigerGraph handles the type.
+
+CREATE QUERY customer_transaction_history_v2(
+    VERTEX<Customer> customer,
+    INT max_txns = 500
 ) FOR GRAPH FraudInvestigationGraph {
 
-    ListAccum<STRING> @@transaction_ids;
+    Seed = {customer};
 
-    Start = {Customer.*};
+    transactions = SELECT t
+        FROM Seed:c -(CustomerMakesTransaction:e)-> Transaction:t
+        ORDER BY t.transaction_dt DESC
+        LIMIT max_txns;
 
-    CustomerSet = SELECT c
-                  FROM Start:c
-                  WHERE c.customer_id == customer_id;
-
-    Transactions = SELECT t
-                   FROM CustomerSet:c -(CustomerMakesTransaction:e)-> Transaction:t
-                   ORDER BY t.ts DESC
-                   LIMIT limit;
-
-    PRINT Transactions;
+    PRINT transactions;
 }
